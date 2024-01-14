@@ -11,19 +11,18 @@ tkinter_labels = (
 )  # массив для хранения надписей, чтобы их было удобнее менять
 
 
-'''def loop_video(event):
-    tkinter.videoplayer.play()
-'''
+def label_dict_to_file():
+    if label_to_value:
+        with open('label_to_value.txt', 'w') as cfg:
+            for num in label_to_value:
+                cfg.write(f'{num}: {label_to_value[num]}\n')
 
 
 def on_closing():
     '''
     Сохраняет пары номер-значение в файл при закрытии окна
     '''
-    if label_to_value:
-        with open('label_to_value.txt', 'w') as cfg:
-            for num in label_to_value:
-                cfg.write(f'{num}: {label_to_value[num]}\n')
+    label_dict_to_file()
     window.destroy()
 
 
@@ -109,12 +108,11 @@ def start():
     имитирует процесс УЗИ
     '''
     global port
-    port.close()
-    if label_to_value:
-        with open('label_to_value.txt', 'w') as cfg:
-            for num in label_to_value:
-                cfg.write(f'{num}: {label_to_value[num]}\n')
-    subprocess.Popen('python simulator.py', shell=True)
+    port.close()  # закрываем порт, т. к. с ним будет работать другой файл
+    label_dict_to_file()  # сохраняем значения меток в файл, чтобы работать с ними в симуляторе
+    subprocess.Popen(
+        'python simulator.py', shell=True
+    )  # с помощью подпроцесса запускаем симулятор
 
 
 lbl_text = f'Прислоните датчик к метке {len(label_to_value.keys()) + 1}'
@@ -132,7 +130,9 @@ start_sim_btn = tkinter.Button(
 )
 bind_btn.place(relx=0, rely=0.6)
 start_sim_btn.place(relx=0, rely=0.7)
-if os.path.isfile('label_to_value.txt'): # если уже существует непустой файл с метками, 
+if os.path.isfile(
+    'label_to_value.txt'
+):  # если уже существует непустой файл с метками, показываем их на экране и добавляем в словарь
     with open('label_to_value.txt') as lbl:
         lst = lbl.readlines()
         label_to_value = {}
@@ -141,7 +141,7 @@ if os.path.isfile('label_to_value.txt'): # если уже существует 
             label_to_value[int(i[0])] = i[1]
     if label_to_value:
         for i in label_to_value:
-            label = tkinter.Label(  # если номер новый, показываем на экране информацию о новой паре
+            label = tkinter.Label(
                 window,
                 text=''.join(
                     [
@@ -153,9 +153,7 @@ if os.path.isfile('label_to_value.txt'): # если уже существует 
             label.pack(side='top')
             tkinter_labels.append(label)
         lbl_text = 'Некоторые метки уже привязаны!'
-lbl = tkinter.Label(  # надпись-подсказка
-    window, text=lbl_text
-)
+lbl = tkinter.Label(window, text=lbl_text)  # надпись-подсказка
 lbl.place(relx=0.5, rely=0.5)
 frame = tkinter.Frame(window)  # помещаем схему размещения меток(картинку)
 frame.place(relx=0, rely=0)
