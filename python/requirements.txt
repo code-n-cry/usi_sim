@@ -2,3 +2,4 @@ pyserial==3.5
 pillow==9.2.0
 black==23.12.1
 flake8==6.1.0
+opencv-python==4.9
