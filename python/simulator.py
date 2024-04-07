@@ -8,7 +8,7 @@ with open("python/label_to_value.txt") as lbl:  # получаем информ�
     for i in lst:
         i = i.replace("\n", "").split(": ")
         label_to_value[i[0]] = i[1]
-#port = serial.Serial("COM7", baudrate=9600, timeout=0.1)
+port = serial.Serial("COM7", baudrate=9600, timeout=0.1)
 current_label = None
 frame_counter = 0
 dim = (600, 400)
