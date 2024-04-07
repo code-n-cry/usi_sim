@@ -5,8 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from pathlib import Path
 
-BASE_DIR = str(Path(__file__).resolve().parent.parent)[2:].replace('\\', '/')
-print(BASE_DIR)
+BASE_DIR = str(Path(__file__).resolve().parent.parent)
 app = FastAPI()
 app.mount(
     BASE_DIR + "/static",

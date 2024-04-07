@@ -119,9 +119,9 @@ lbl_text = f"Прислоните датчик к метке {len(label_to_value
 window = tkinter.Tk()  # создание окна
 window.title("Привязка меток")
 window.geometry("800x600")
-#port = serial.Serial(
-#    "COM7", baudrate=9600
-#)  # объявление порта, номер другой может быть, пока что лучше смотреть через arduino IDE
+port = serial.Serial(
+    "/dev/ttyUSB0", baudrate=9600
+)  # объявление порта, номер другой может быть, пока что лучше смотреть через arduino IDE
 bind_btn = tkinter.Button(
     window, text="Добавить метку", command=bind
 )  # создаём кнопку
