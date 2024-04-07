@@ -1,0 +1,10 @@
+.valueList, .btn{
+    display: flex;
+    justify-content: center;
+}
+.btn{
+    padding-top: 0.5em;
+}
+#change_button{
+    border-radius: 5px;
+}
