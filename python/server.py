@@ -26,6 +26,7 @@ def init_webhooks(base_url):
 
 if settings.USE_NGROK:
     from pyngrok import ngrok
+
     port = "8000"
     public_url = ngrok.connect(port).public_url
     settings.BASE_URL = public_url
@@ -42,7 +43,9 @@ templates = Jinja2Templates(directory=BASE_DIR + "\\templates")
 chosen_values = {'cor': 'Норма, CN', 'pulm': 'Норма, LN'}
 with open('python/patology.txt', 'r') as all_patologies:
     values = {}
-    list_patologies = [i.replace('\n', '').split(',') for i in all_patologies.readlines()]
+    list_patologies = [
+        i.replace('\n', '').split(',') for i in all_patologies.readlines()
+    ]
     for patology in list_patologies:
         if patology[-1] not in values.keys():
             values[patology[-1]] = [', '.join(patology[:-1])]
@@ -54,7 +57,7 @@ with open('python/patology.txt', 'r') as all_patologies:
 async def index(request: Request):
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "chosen": chosen_values, "values": values}
+        {"request": request, "chosen": chosen_values, "values": values},
     )
 
 
@@ -64,7 +67,7 @@ async def handle_change(request: Request):
     chosen_values = dict(form_data)
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "chosen": chosen_values, "values": values}
+        {"request": request, "chosen": chosen_values, "values": values},
     )
 
 

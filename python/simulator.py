@@ -6,7 +6,9 @@ from pathlib import Path
 from requests import get
 
 BASE_DIR = str(Path(__file__).resolve().parent.parent)
-with open(BASE_DIR + "/python/label_to_value.txt") as lbl:  # получаем информацию о метках
+with open(
+    BASE_DIR + "/python/label_to_value.txt"
+) as lbl:  # получаем информацию о метках
     lst = lbl.readlines()
     label_to_value = {}
     for i in lst:
@@ -20,7 +22,9 @@ folder_name = BASE_DIR + "/videos/"
 current_video = folder_name + "basis_00.mp4"
 ex = False
 while True:
-    current_videos = get('http://127.0.0.1:8000/current-values').json()['Сердце']
+    current_videos = get('http://127.0.0.1:8000/current-values').json()[
+        'Сердце'
+    ]
     print(current_videos)
     current_line = (
         port.readline().decode(encoding="latin-1").replace("\r\n", "")
