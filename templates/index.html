@@ -7,13 +7,13 @@
   </head>
   <body>
     <h2 align="center">Замена видео</h2>
-    <form method="post" action="handle-change">
+    <form method="post" action="handle-change" id="patologies">
       <table class="valueList">
         {% for part in values %}
           <tr>
-              <td><b>Метка 1</b> ({{ part }}):</td>
+              <td><b>Метка {{ loop.index }}</b> ({{ part }}):</td>
               <td>
-                  <select id="value" name="value">
+                  <select id="{{ part }}" name="{{ part }}">
                     <option>{{ chosen[part] }}</option>
                       {% for option in values[part] %}
                         {% if option != chosen[part] %}
@@ -26,7 +26,7 @@
         {% endfor %}
       </table>
       <div class="btn">
-        <input type="submit" value="Поменять" id="change_button">
+        <input type="submit" value="Поменять" id="change_button" for="patologies">
       </div>
     </form>
   </body>

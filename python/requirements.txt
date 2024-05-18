@@ -2,7 +2,7 @@ black==23.12.1
 fastapi==0.80.0
 flake8==6.1.0
 jinja2==3.1.2
-opencv-python==4.9.0.80
+pyngrok==7.1.6
 pillow==9.2.0
 pyserial==3.5
 python-multipart==0.0.6
