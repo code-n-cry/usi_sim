@@ -28,10 +28,13 @@ def on_closing():
 
 def bind():
     """
-    При нажатии кнопки "Добавить метку" добавляет в переменную label_to_value
+    При нажатии кнопки "Добавить метку" открывает порт и добавляет в переменную label_to_value
     пару номер-значение
     """
-    global port, lbl
+    global lbl
+    port = serial.Serial(
+        "/dev/ttyUSB0", baudrate=9600
+    )  # открытие порта, номер другой может быть, пока что лучше смотреть через arduino IDE
     with_warning = False  # переменная-флаг, чтобы заменить метку
     if not port.is_open:
         port.open()
@@ -102,16 +105,21 @@ def bind():
     port.close()
 
 
+def server():
+    """
+    При нажатии кнопки "Запустит сервер" показывает QR-код с адресом сайта для инструктораs
+    """
+    subprocess.Popen("python python/server.py", shell=True)
+
+
 def start():
     """
     При нажатии кнопки "Запустить симулятор" открывает другое окно, которое
     имитирует процесс УЗИ
     """
-    global port
-    port.close()  # закрываем порт, т. к. с ним будет работать другой файл
     label_dict_to_file()  # сохраняем значения меток в файл, чтобы работать с ними в симуляторе
     subprocess.Popen(
-        "python simulator.py", shell=True
+        "python python/simulator.py", shell=True
     )  # с помощью подпроцесса запускаем симулятор
 
 
@@ -119,21 +127,22 @@ lbl_text = f"Прислоните датчик к метке {len(label_to_value
 window = tkinter.Tk()  # создание окна
 window.title("Привязка меток")
 window.geometry("800x600")
-port = serial.Serial(
-    "/dev/ttyUSB0", baudrate=9600
-)  # объявление порта, номер другой может быть, пока что лучше смотреть через arduino IDE
 bind_btn = tkinter.Button(
     window, text="Добавить метку", command=bind
-)  # создаём кнопку
+)  # кнопка для привязки меток
 start_sim_btn = tkinter.Button(
     window, text="Запустить симулятор", command=start
-)
+)  # кнопка для запуска самого симулятор
+start_server_btn = tkinter.Button(
+    window, text="Запустить сервер", command=server
+)  # кнопка для создания сервера для инструктора
 bind_btn.place(relx=0, rely=0.6)
 start_sim_btn.place(relx=0, rely=0.7)
+start_server_btn.place(relx=0, rely=0.8)
 if os.path.isfile(
-    "label_to_value.txt"
+    "python/label_to_value.txt"
 ):  # если уже существует непустой файл с метками, показываем их на экране и добавляем в словарь
-    with open("label_to_value.txt", 'r') as lbl:
+    with open("python/label_to_value.txt", 'r') as lbl:
         lst = lbl.readlines()
         label_to_value = {}
         for i in lst:
@@ -158,7 +167,7 @@ lbl.place(relx=0.5, rely=0.5)
 frame = tkinter.Frame(window)  # помещаем схему размещения меток(картинку)
 frame.place(relx=0, rely=0)
 canvas = tkinter.Canvas(window, height=350, width=150)
-image = Image.open("tors.png")
+image = Image.open("python/tors.png")
 photo = ImageTk.PhotoImage(image)
 image = canvas.create_image(0, 0, anchor="nw", image=photo)
 canvas.place(relx=0, rely=0)

@@ -1,4 +1,5 @@
 import uvicorn
+import qrcode
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -19,7 +20,6 @@ app = FastAPI()
 
 
 def init_webhooks(base_url):
-    # Update inbound traffic via APIs to use the public-facing ngrok URL
     pass
 
 
@@ -30,8 +30,7 @@ if settings.USE_NGROK:
     public_url = ngrok.connect(port).public_url
     settings.BASE_URL = public_url
     init_webhooks(public_url)
-    print(public_url)
-
+    qr = qrcode.make(public_url)
 
 app.mount(
     "/static",
@@ -39,7 +38,15 @@ app.mount(
     name="static",
 )
 templates = Jinja2Templates(directory=BASE_DIR + "\\templates")
-chosen_values = {'cor': 'Норма, CN', 'pulm': 'Норма, LN'}
+chosen_values = {
+    '1': 'Норма, LN',
+    '2': 'Норма, LN',
+    '3': 'Норма, CN',
+    '4': 'Норма, CN',
+    '5': 'Норма, LN',
+    '6': 'Норма, CN',
+    '7': 'Норма, LN',
+}
 with open('python/patology.txt', 'r') as all_patologies:
     values = {}
     list_patologies = [
@@ -62,8 +69,11 @@ async def index(request: Request):
 
 @app.post("/handle-change")
 async def handle_change(request: Request):
+    global chosen_values
     form_data = await request.form()
     chosen_values = dict(form_data)
+    print(dict(form_data))
+    print(chosen_values)
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "chosen": chosen_values, "values": values},
@@ -72,7 +82,10 @@ async def handle_change(request: Request):
 
 @app.get("/current-values")
 async def handle_valyes(request: Request):
+    global chosen_values
+    print(chosen_values)
     return chosen_values
 
 
+qr.show()
 uvicorn.run(app, host="localhost", port=8000)
