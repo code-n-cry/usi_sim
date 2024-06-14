@@ -6,4 +6,5 @@ opencv-python==4.9.0.80
 pillow==9.2.0
 pyserial==3.5
 python-multipart==0.0.6
+python-vlc==3.0.20123
 uvicorn==0.18.3

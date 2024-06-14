@@ -1,6 +1,7 @@
 import os
 import serial
 import subprocess
+import time
 import tkinter
 from tkinter.simpledialog import askinteger
 from PIL import Image, ImageTk
@@ -109,6 +110,7 @@ def start():
     """
     global port
     port.close()  # закрываем порт, т. к. с ним будет работать другой файл
+    time.sleep(2)
     label_dict_to_file()  # сохраняем значения меток в файл, чтобы работать с ними в симуляторе
     subprocess.Popen(
         "python simulator.py", shell=True
@@ -146,7 +148,7 @@ if os.path.isfile(
                 text="".join(
                     [
                         f"Метка {i},",
-                        f"значение: {label_to_value[len(label_to_value.keys())]}",
+                        f"значение: {label_to_value[i]}",
                     ]
                 ),
             )
