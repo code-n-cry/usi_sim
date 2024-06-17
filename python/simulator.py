@@ -36,11 +36,24 @@ while True:
         label_to_video[i] = (
             folder_name + f'{i}_' + current_videos[i].split(', ')[1] + '.mp4'
         )  # привязываем видео к меткам
-    current_line = port.readline().decode(encoding="latin-1").replace('\r\n', '')
-    if current_line and current_line != '0' and label_to_video[label_to_value[current_line]] != current_video:
+    current_line = (
+        port.readline().decode(encoding="latin-1").replace('\r\n', '')
+    )
+    if (
+        current_line
+        and current_line != '0'
+        and label_to_video[label_to_value[current_line]] != current_video
+    ):
         if pid:
             Popen(["kill", '-9', str(pid)])
         current_video = label_to_video[label_to_value[current_line]]
-        args = ['vlc', '-I', 'dummy', current_video, '--no-embedded-video', '--loop']
+        args = [
+            'vlc',
+            '-I',
+            'dummy',
+            current_video,
+            '--no-embedded-video',
+            '--loop',
+        ]
         process = Popen(args)
         pid = process.pid
