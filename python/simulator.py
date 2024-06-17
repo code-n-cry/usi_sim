@@ -3,7 +3,6 @@ from subprocess import Popen
 from pathlib import Path
 import vlc
 from requests import get
-import time
 
 BASE_DIR = str(Path(__file__).resolve().parent.parent)
 with open(

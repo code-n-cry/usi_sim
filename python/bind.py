@@ -1,7 +1,6 @@
 import os
 import serial
 import subprocess
-import time
 import tkinter
 from tkinter.simpledialog import askinteger
 from PIL import Image, ImageTk
