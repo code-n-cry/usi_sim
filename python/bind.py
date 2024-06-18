@@ -24,6 +24,8 @@ def on_closing():
     """
     label_dict_to_file()
     window.destroy()
+    args = ["killall", "python"]
+    subprocess.Popen(args)
 
 
 def bind():
@@ -109,7 +111,8 @@ def server():
     """
     При нажатии кнопки "Запустит сервер" показывает QR-код с адресом сайта для инструктораs
     """
-    subprocess.Popen("python python/server.py", shell=True)
+    args = ["python", "server.py"]
+    subprocess.Popen(args)
 
 
 def start():
@@ -119,7 +122,7 @@ def start():
     """
     label_dict_to_file()  # сохраняем значения меток в файл, чтобы работать с ними в симуляторе
     subprocess.Popen(
-        "python python/simulator.py", shell=True
+        ["python", "simulator.py"]
     )  # с помощью подпроцесса запускаем симулятор
 
 
@@ -140,9 +143,9 @@ bind_btn.place(relx=0, rely=0.6)
 start_sim_btn.place(relx=0, rely=0.7)
 start_server_btn.place(relx=0, rely=0.8)
 if os.path.isfile(
-    "python/label_to_value.txt"
+    "label_to_value.txt"
 ):  # если уже существует непустой файл с метками, показываем их на экране и добавляем в словарь
-    with open("python/label_to_value.txt", 'r') as lbl:
+    with open("label_to_value.txt", 'r') as lbl:
         lst = lbl.readlines()
         label_to_value = {}
         for i in lst:
@@ -155,7 +158,7 @@ if os.path.isfile(
                 text="".join(
                     [
                         f"Метка {i},",
-                        f"значение: {label_to_value[len(label_to_value.keys())]}",
+                        f"значение: {label_to_value[i]}",
                     ]
                 ),
             )
@@ -167,7 +170,7 @@ lbl.place(relx=0.5, rely=0.5)
 frame = tkinter.Frame(window)  # помещаем схему размещения меток(картинку)
 frame.place(relx=0, rely=0)
 canvas = tkinter.Canvas(window, height=350, width=150)
-image = Image.open("python/tors.png")
+image = Image.open("tors.png")
 photo = ImageTk.PhotoImage(image)
 image = canvas.create_image(0, 0, anchor="nw", image=photo)
 canvas.place(relx=0, rely=0)
