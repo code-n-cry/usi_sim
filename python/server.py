@@ -25,7 +25,6 @@ def init_webhooks(base_url):
 
 if settings.USE_NGROK:
     from pyngrok import ngrok
-
     port = "8000"
     public_url = ngrok.connect(port).public_url
     settings.BASE_URL = public_url
