@@ -70,7 +70,14 @@ async def index(request: Request):
 async def handle_change(request: Request):
     global chosen_values
     form_data = await request.form()
-    chosen_values = dict(form_data)
+    for i in dict(form_data):
+        if i == '3':
+            chosen_values['3'] = form_data[i]
+            chosen_values['4'] = form_data[i]
+            chosen_values['6'] = form_data[i]
+        else:
+            chosen_values[i] = form_data[i]
+    print(dict(form_data), chosen_values)
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "chosen": chosen_values, "values": values},
