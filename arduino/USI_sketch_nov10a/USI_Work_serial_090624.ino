@@ -11,7 +11,7 @@
 #include <Adafruit_PN532.h>
 
 // пин прерывания
-#define PN532_IRQ 9
+#define PN532_IRQ 2
 // создаём объект для работы со сканером и передаём ему два параметра
 // первый — номер пина прерывания
 // вторым — число 100
@@ -20,51 +20,64 @@
 // поэтому передаём цифру, большая чем любой пин Arduino
 Adafruit_PN532 nfc(PN532_IRQ, 100);
 
-void setup(void) {
+void setup() {
+  
   Serial.begin(9600);
+  pinMode(9, INPUT); // объявляем пин для кнопки
   // инициализация RFID/NFC сканера
   nfc.begin();
+  delay(500);
   int versiondata = nfc.getFirmwareVersion();
-  // if (!versiondata) {
-   //  Serial.print("Didn't find RFID/NFC reader");
-  //   while (1) {
-   //  }
-  // }
+  // Serial.print(versiondata); печатаем номер прошивки
+  if (!versiondata) {
+   Serial.print("Didn't find RFID/NFC reader");
+    while (1) {
+     }
+   }
 
   // Serial.println("Found RFID/NFC reader");
   // // настраиваем модуль
   nfc.SAMConfig();
- //  Serial.println("Waiting for a card ...");
+  // Serial.println("Waiting for a card ...");
 }
 
-void loop(void) {
+void loop() {
   uint8_t success;
   // буфер для хранения ID карты
   uint8_t uid[8];
   // размер буфера карты
+ // if (Serial.available() > 0) {// проверяем готов ли принимающий компьютер читать данные (для готовности следует послать 1)
+ // Serial.print("1"); // посылаем единицу
   uint8_t uidLength;
   // смотрим нажата ли кнопка, если нажата сканируем
-     if(digitalRead(9)==HIGH){//если кнопка нажата ...
+ // Serial.print(digitalRead(9)); // до нажатия
+ // Serial.println("");
+ // Serial.print(digitalRead(9)); // после нажатия
+ // Serial.println("");
+  if(digitalRead(9)==HIGH){//если кнопка нажата ...HIGH
+ 
   // слушаем новые метки
   success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength);
-  // если найдена карта
+    // если найдена карта
+
   if (success) {
     // выводим в консоль полученные данные
  //  Serial.println("Found a card");
-   // Serial.print("ID Length: ");
-   //Serial.print(uidLength, DEC);
-   // Serial.println(" bytes");
+   
+   // Serial.print(uidLength, DEC);
+    //Serial.println(" bytes");
    // Serial.print("ID Value: ");
-    nfc.PrintHex(uid, uidLength);
-    // nfc.PrintHexChar(uid, uidLength);
+    // nfc.PrintHex(uid, uidLength); //(uid, uidLength);
+    nfc.PrintHexChar (uid, uidLength); //  печатаем номер карты
+   // nfc.PrintHexChar(uid,uidLength); //печатаем номер карты
     Serial.println("");
     delay(1000);
    }
-     }
+    }
     else // если не нажата
 {
   Serial.println("0");
-    delay(1000);
+  delay(1000);
 }
-
-}
+  }
+//}
