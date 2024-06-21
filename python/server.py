@@ -1,4 +1,3 @@
-import uvicorn
 import qrcode
 
 from fastapi import FastAPI, Request
@@ -91,4 +90,3 @@ async def handle_valyes(request: Request):
 
 
 qr.show()
-uvicorn.run(app, host="localhost", port=8000)

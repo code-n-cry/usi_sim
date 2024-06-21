@@ -24,7 +24,7 @@ def on_closing():
     """
     label_dict_to_file()
     window.destroy()
-    args = ["killall", "python"]
+    args = ["killall", "uvicorn", "&&", "killall", "ngrok"]
     subprocess.Popen(args)
 
 
@@ -111,7 +111,7 @@ def server():
     """
     При нажатии кнопки "Запустит сервер" показывает QR-код с адресом сайта для инструктораs
     """
-    args = ["python", "server.py"]
+    args = ["python3", "-m", "uvicorn", "server:app"]
     subprocess.Popen(args)
 
 
@@ -122,7 +122,7 @@ def start():
     """
     label_dict_to_file()  # сохраняем значения меток в файл, чтобы работать с ними в симуляторе
     subprocess.Popen(
-        ["python", "simulator.py"]
+        ["python3", "simulator.py"]
     )  # с помощью подпроцесса запускаем симулятор
 
 
