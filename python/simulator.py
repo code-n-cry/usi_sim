@@ -40,7 +40,10 @@ while True:
     current_line = (
         port.readline().decode(encoding="latin-1").replace('\r\n', '')
     )
-    if current_line and label_to_video[label_to_value[current_line]] != current_video:
+    if (
+        current_line
+        and label_to_video[label_to_value[current_line]] != current_video
+    ):
         if pid:
             Popen(["kill", '-9', str(pid)])
         current_video = label_to_video[label_to_value[current_line]]
