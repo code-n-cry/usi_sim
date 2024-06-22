@@ -43,7 +43,7 @@
                 <select id="5" name="5">
                   <option>{{ chosen["5"] }}</option>
                     {% for option in values["pulm"] %}
-                      {% if option != chosen["5"] %}
+                      {% if option != chosen["5"] and option != "А - линии, AL" %}
                         <option>{{ option }}</option>
                       {% endif %}
                     {% endfor %}
@@ -71,7 +71,7 @@
             <select id="7" name="7">
               <option>{{ chosen["7"] }}</option>
                 {% for option in values["pulm"] %}
-                  {% if option != chosen["7"] %}
+                  {% if option != chosen["7"] and option != "А - линии, AL" %}
                     <option>{{ option }}</option>
                   {% endif %}
                 {% endfor %}

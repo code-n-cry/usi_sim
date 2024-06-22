@@ -77,7 +77,6 @@ async def handle_change(request: Request):
             chosen_values['6'] = form_data[i]
         else:
             chosen_values[i] = form_data[i]
-    print(dict(form_data), chosen_values)
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "chosen": chosen_values, "values": values},
