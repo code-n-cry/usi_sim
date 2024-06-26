@@ -52,9 +52,13 @@ while True:
             '-I',
             'dummy',
             current_video,
-            '--no-embedded-video',
             '--no-video-title',
             '--loop',
+            '--width=1600',
+            '--height=800',
+            '--no-qt-video-autoresize',
+            '--no-autoscale',
+            '--v4l2-audio-mute'
         ]
         process = Popen(args)
         pid = process.pid

@@ -26,7 +26,7 @@ def on_closing():
     window.destroy()
     args = ["killall", "uvicorn", "&&", "killall", "ngrok"]
     subprocess.Popen(args)
-    args2 = ["sudo", "fuser", "-k", "8000/tcp"]
+    args2 = ["fuser", "-k", "8000/tcp"]
     subprocess.Popen(args2)
 
 
