@@ -6,9 +6,7 @@ from tkinter.simpledialog import askinteger
 from PIL import Image, ImageTk
 
 label_to_value = {}  # переменная для хранение пар номер-значение
-tkinter_labels = (
-    []
-)  # массив для хранения надписей, чтобы их было удобнее менять
+tkinter_labels = []  # массив для хранения надписей, чтобы их было удобнее менять
 
 
 def label_dict_to_file():
@@ -53,9 +51,7 @@ def bind():
             label_to_value[len(label_to_value.keys()) + 1] = current_line
             port.read_all()
             break
-        elif (
-            current_line in label_to_value.values()
-        ):  # если была, активируем флаг
+        elif current_line in label_to_value.values():  # если была, активируем флаг
             with_warning = True
             port.read_all()
             break
@@ -81,9 +77,7 @@ def bind():
             )
             for (
                 ind
-            ) in (
-                label_to_value
-            ):  # удаляем старую метку с таким же значением из списка
+            ) in label_to_value:  # удаляем старую метку с таким же значением из списка
                 if label_to_value[ind] == current_line and ind != num:
                     tkinter_labels[ind - 1].configure(
                         text=""
@@ -141,13 +135,16 @@ start_sim_btn = tkinter.Button(
 start_server_btn = tkinter.Button(
     window, text="Запустить сервер", command=server
 )  # кнопка для создания сервера для инструктора
+author_label = tkinter.Label(
+    window, text="Создатели: Щукины Владислав Владимирович и Егор Владиславович"
+)
 bind_btn.place(relx=0, rely=0.6)
 start_sim_btn.place(relx=0, rely=0.7)
 start_server_btn.place(relx=0, rely=0.8)
 if os.path.isfile(
     "label_to_value.txt"
 ):  # если уже существует непустой файл с метками, показываем их на экране и добавляем в словарь
-    with open("label_to_value.txt", 'r') as lbl:
+    with open("label_to_value.txt", "r") as lbl:
         lst = lbl.readlines()
         label_to_value = {}
         for i in lst:
@@ -169,6 +166,7 @@ if os.path.isfile(
         lbl_text = "Некоторые метки уже привязаны!"
 lbl = tkinter.Label(window, text=lbl_text)  # надпись-подсказка
 lbl.place(relx=0.5, rely=0.5)
+author_label.place(relx=0.3, rely=0.93)
 frame = tkinter.Frame(window)  # помещаем схему размещения меток(картинку)
 frame.place(relx=0, rely=0)
 canvas = tkinter.Canvas(window, height=350, width=150)
@@ -176,7 +174,5 @@ image = Image.open("tors.png")
 photo = ImageTk.PhotoImage(image)
 image = canvas.create_image(0, 0, anchor="nw", image=photo)
 canvas.place(relx=0, rely=0)
-window.protocol(
-    "WM_DELETE_WINDOW", on_closing
-)  # привязываем функцию для закрытия
+window.protocol("WM_DELETE_WINDOW", on_closing)  # привязываем функцию для закрытия
 window.mainloop()
