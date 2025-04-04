@@ -107,7 +107,7 @@ def server():
     """
     При нажатии кнопки "Запустит сервер" показывает QR-код с адресом сайта для инструктораs
     """
-    args = ["python3", "-m", "uvicorn", "server:app"]
+    args = ["python3", "-m", "uvicorn", "server:app", "--port", "8000", "--host", "0.0.0.0"]
     subprocess.Popen(args)
 
 

@@ -9,7 +9,6 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    BASE_URL = "http://localhost:8000"
     USE_NGROK = True
 
 
@@ -26,9 +25,7 @@ if settings.USE_NGROK:
     from pyngrok import ngrok
 
     port = "8000"
-    public_url = ngrok.connect(port).public_url
-    settings.BASE_URL = public_url
-    init_webhooks(public_url)
+    public_url = f"http://10.42.0.1:{port}"
     qr = qrcode.make(public_url)
 
 app.mount(

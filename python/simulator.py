@@ -12,7 +12,12 @@ with open(
     label_to_value = {}
     for i in lst:
         i = i.replace("\n", "").split(": ")
-        label_to_value[i[1]] = i[0]
+        if i[0] != '8' and i[0] != '9':
+            label_to_value[i[1]] = i[0]
+        elif i[0] == '8':
+            label_to_value[i[1]] = '7'
+        else:
+            label_to_value[i[1]] = '2'
 label_to_value[''] = '0'
 label_to_value['0'] = '0'
 port = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=1)
@@ -40,9 +45,9 @@ while True:
     current_line = (
         port.readline().decode(encoding="latin-1").replace('\r\n', '')
     )
+    print(current_line)
     if (
-        current_line
-        and label_to_video[label_to_value[current_line]] != current_video
+        label_to_video[label_to_value[current_line]] != current_video
     ):
         if pid:
             Popen(["kill", '-9', str(pid)])
