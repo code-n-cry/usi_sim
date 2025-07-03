@@ -12,12 +12,7 @@ with open(
     label_to_value = {}
     for i in lst:
         i = i.replace("\n", "").split(": ")
-        if i[0] != '8' and i[0] != '9':
-            label_to_value[i[1]] = i[0]
-        elif i[0] == '8':
-            label_to_value[i[1]] = '7'
-        else:
-            label_to_value[i[1]] = '2'
+        label_to_value[i[1]] = i[0]
 label_to_value[''] = '0'
 label_to_value['0'] = '0'
 port = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=1)
