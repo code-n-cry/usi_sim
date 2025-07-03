@@ -45,7 +45,6 @@ while True:
     current_line = (
         port.readline().decode(encoding="latin-1").replace('\r\n', '')
     )
-    print(current_line)
     if (
         label_to_video[label_to_value[current_line]] != current_video
     ):
