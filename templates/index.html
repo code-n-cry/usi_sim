@@ -1,87 +1,250 @@
 <!DOCTYPE html>
-<html lang="ru">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', path='/style_index.css') }}"
-  </head>
-  <body>
-    <h2 align="center">Замена видео</h2>
-    <form method="post" action="handle-change" id="patologies">
-      <table class="valueList">
-        <tr>
-          <th>Сердце</th>
-          <td>
-              <select id="3" name="3">
-                <option>{{ chosen["3"] }}</option>
-                  {% for option in values["cor"] %}
-                    {% if option != chosen["3"] %}
-                      <option>{{ option }}</option>
-                    {% endif %}
-                  {% endfor %}
-              </select>
-          </td>
-        </tr>
-        <tr><th>Легкие</th></tr>
-          <tr><th>Правое</th></tr>
-            <tr>
-              <td>Верхушка</td>
-              <td>
-                <select id="1" name="1">
-                  <option>{{ chosen["1"] }}</option>
-                    {% for option in values["pulm"] %}
-                      {% if option != chosen["1"] %}
-                        <option>{{ option }}</option>
-                      {% endif %}
-                    {% endfor %}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Основание</td>
-              <td>
-                <select id="5" name="5">
-                  <option>{{ chosen["5"] }}</option>
-                    {% for option in values["pulm"] %}
-                      {% if option != chosen["5"] and option != "А - линии, AL" %}
-                        <option>{{ option }}</option>
-                      {% endif %}
-                    {% endfor %}
-                </select>
-              </td>
-            </tr>
-        <tr>
-        <tr><th>Левое</th></tr>
-          <tr>
-            <td>Верхушка</td>
-            <td>
-              <select id="2" name="2">
-                <option>{{ chosen["2"] }}</option>
-                  {% for option in values["pulm"] %}
-                    {% if option != chosen["2"] %}
-                      <option>{{ option }}</option>
-                    {% endif %}
-                  {% endfor %}
-              </select>
-            </td>
-          </tr>
-        <tr>
-          <td>Основание</td>
-          <td>
-            <select id="7" name="7">
-              <option>{{ chosen["7"] }}</option>
-                {% for option in values["pulm"] %}
-                  {% if option != chosen["7"] and option != "А - линии, AL" %}
-                    <option>{{ option }}</option>
-                  {% endif %}
-                {% endfor %}
-            </select>
-          </td>
-        </tr>
-      </table>
-      <div class="btn">
-        <input type="submit" value="Поменять" id="change_button" for="patologies">
-      </div>
-    </form>
-  </body>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Менеджер Меток</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <style>
+        /* Базовые стили */
+        html, body {
+            margin: 0; padding: 0; height: 100%;
+            font-size: 11px;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background-color: #f7f7f7;
+            transition: background-color 0.3s;
+        }
+        main.container {
+            width: 100%; max-width: 800px;
+            padding: 2rem;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        /* Кнопка темы */
+        .buttons { position: relative; text-align: center; margin-bottom: 1.5rem; }
+        #toggle-theme {
+            position: absolute; right: 0; top: 0;
+            font-size: 1.2em; padding: 0.2em;
+            background: none; border: none; cursor: pointer;
+        }
+        #toggle-theme:focus { outline: none; }
+
+        /* Прочие стили как были */
+        .buttons button { margin: 0 0.4em; }
+        #add-patology,#rename-label,#change-code,#delete-label { display:none; }
+        details { margin-left:1.5em; margin-bottom:1em; }
+        .actions button { margin-left:0.6em; font-size:0.9em; padding:0.3em 0.8em; }
+        .video-list { margin-left:2.5em; list-style:disc; margin-bottom:1em; }
+
+        /* Главный экран */
+        #file-manager.main-view details > summary {
+            list-style:none; padding-left:0; color:#111!important; font-size:1.1em;
+        }
+        #file-manager.main-view details > summary::-webkit-details-marker { display:none; }
+        #file-manager.main-view details > summary::marker { font-size:0; }
+        #file-manager.main-view details > summary::after { display:none; content:none; }
+
+        /* Внутри метки */
+        #file-manager:not(.main-view) details[open] > summary { color:#000; }
+        #file-manager:not(.main-view) details:not([open]) > summary { color:#555; }
+
+        /* === Dark theme overrides === */
+        html[data-theme="dark"] body {
+            background-color: #121212;
+        }
+        html[data-theme="dark"] main.container {
+            background-color: #1e1e1e;
+            color: #eee;
+        }
+        html[data-theme="dark"] h1 {
+            color: #eee;
+        }
+        html[data-theme="dark"] #file-manager.main-view details > summary {
+            color: #eee !important;
+        }
+        html[data-theme="dark"] #file-manager:not(.main-view) details[open] > summary {
+            color: #fff;
+        }
+        html[data-theme="dark"] #file-manager:not(.main-view) details:not([open]) > summary {
+            color: #aaa;
+        }
+        html[data-theme="light"] .contrast {
+            background-color: #e0e0e0;    /* светлый серый фон */
+            color: #333333;               /* темно-серый текст */
+            border: 1px solid #cccccc;    /* легкая граница */
+        }
+        html[data-theme="light"] .contrast:hover,
+        html[data-theme="light"] .contrast:focus {
+            background-color: #d4d4d4;    /* чуть темнее при наведении */
+            color: #222222;
+        }
+    </style>
+</head>
+<body>
+<main class="container">
+    <h1>Менеджер Меток</h1>
+    <div class="buttons">
+        <button id="back-button">Назад к меткам</button>
+        <button id="add-label" class="contrast">Добавить метку</button>
+        <button id="add-patology">Добавить патологию</button>
+        <button id="rename-label">Переименовать метку</button>
+        <button id="change-code">Изменить код метки</button>
+        <button id="delete-label">Удалить метку</button>
+        <button id="toggle-theme" title="Переключить тему">☀️</button>
+    </div>
+    <div id="file-manager" class="main-view"></div>
+</main>
+
+<script>
+    // Theme toggle
+    const THEME_KEY = 'theme';
+    const toggleBtn = document.getElementById('toggle-theme');
+    let theme = localStorage.getItem(THEME_KEY) || 'light';
+    const applyTheme = () => {
+        document.documentElement.setAttribute('data-theme', theme);
+        toggleBtn.textContent = theme === 'light' ? '☀️' : '🌙';
+    };
+    applyTheme();
+    toggleBtn.addEventListener('click', () => {
+        theme = (theme === 'light' ? 'dark' : 'light');
+        localStorage.setItem(THEME_KEY, theme);
+        applyTheme();
+    });
+
+    // API as before...
+    const api = {
+        getAll:    () => fetch('/api/data').then(r => r.json()),
+        createLbl:(num,code)=> fetch('/api/labels',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({number:num,code}) }),
+        renameNum:(lbl,newNum)=> fetch(`/api/labels/${encodeURIComponent(lbl)}/number`,{ method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({newName:newNum}) }),
+        renameCode:(lbl,newCode)=> fetch(`/api/labels/${encodeURIComponent(lbl)}/code`,{ method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({newName:newCode}) }),
+        delLbl: lbl=> fetch(`/api/labels/${encodeURIComponent(lbl)}`,{method:'DELETE'}),
+        createPat:(lbl,name)=> fetch(`/api/labels/${encodeURIComponent(lbl)}/pathologies`,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name}) }),
+        renamePat:(lbl,pat,newName)=> fetch(`/api/labels/${encodeURIComponent(lbl)}/pathologies/${encodeURIComponent(pat)}`,{ method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({newName}) }),
+        delPat:(lbl,pat)=> fetch(`/api/labels/${encodeURIComponent(lbl)}/pathologies/${encodeURIComponent(pat)}`,{method:'DELETE'}),
+        upload:(lbl,pat,files)=>{
+            const fd = new FormData();
+            files.forEach(f=>fd.append('files', f));
+            return fetch(`/api/labels/${encodeURIComponent(lbl)}/pathologies/${encodeURIComponent(pat)}/files`,{ method:'POST', body:fd });
+        }
+    };
+
+    let data = [], currentLabel = null;
+    let openStates = JSON.parse(localStorage.getItem('openStates')||'{}');
+    const fm        = document.getElementById('file-manager');
+    const backBtn   = document.getElementById('back-button');
+    const addLblBtn = document.getElementById('add-label');
+    const addPatBtn = document.getElementById('add-patology');
+    const renLblBtn = document.getElementById('rename-label');
+    const chCodeBtn = document.getElementById('change-code');
+    const delLblBtn = document.getElementById('delete-label');
+    const header    = document.querySelector('h1');
+
+    function saveOpenStates(){ localStorage.setItem('openStates', JSON.stringify(openStates)); }
+
+    backBtn.onclick = ()=>{ currentLabel = null; loadAndRender(); };
+    addLblBtn.onclick = async ()=>{ const num=prompt('Название метки:'), code=prompt('Код метки:'); if(!num||!code) return; await api.createLbl(num,code); loadAndRender(); };
+    renLblBtn.onclick = async ()=>{ const [n,c]=currentLabel.split('_'); const nn=prompt('Новое название:',n); if(!nn) return; await api.renameNum(currentLabel,nn); currentLabel=`${nn}_${c}`; loadAndRender(); };
+    chCodeBtn.onclick = async ()=>{ const [n,c]=currentLabel.split('_'); const nc=prompt('Новый код:',c); if(!nc) return; await api.renameCode(currentLabel,nc); currentLabel=`${n}_${nc}`; loadAndRender(); };
+    delLblBtn.onclick = async ()=>{ if(!confirm(`Удалить метку «${currentLabel}»?`)) return; await api.delLbl(currentLabel); currentLabel=null; loadAndRender(); };
+    addPatBtn.onclick = async ()=>{ const nm=prompt('Название патологии:'); if(!nm) return; await api.createPat(currentLabel,nm); loadAndRender(); };
+
+    async function loadAndRender(){
+        data = await api.getAll();
+        render();
+    }
+
+    function render(){
+        // тема видна только на главном экране
+        toggleBtn.style.display = currentLabel ? 'none' : 'inline-block';
+        header.textContent = currentLabel || 'Менеджер Меток';
+
+        if(!currentLabel){
+            backBtn.style.display='none';
+            addLblBtn.style.display='inline-block';
+            addPatBtn.style.display=renLblBtn.style.display=chCodeBtn.style.display=delLblBtn.style.display='none';
+            fm.classList.add('main-view');
+        } else {
+            backBtn.style.display='inline-block';
+            addLblBtn.style.display='none';
+            addPatBtn.style.display=renLblBtn.style.display=chCodeBtn.style.display=delLblBtn.style.display='inline-block';
+            fm.classList.remove('main-view');
+        }
+
+        fm.innerHTML='';
+        if(!currentLabel){
+            data.forEach(lbl=>{
+                const d=document.createElement('details'); d.open=true;
+                const s=document.createElement('summary'); s.textContent=lbl.name;
+                const act=document.createElement('span'); act.className='actions';
+                act.appendChild(createBtn('Войти',()=>{ currentLabel=lbl.name; render(); }));
+                s.appendChild(act); d.appendChild(s); fm.appendChild(d);
+            });
+        } else {
+            const lbl=data.find(l=>l.name===currentLabel);
+            lbl.pathologies.forEach(pat=>{
+                const key=currentLabel+'|'+pat.name;
+                const d=document.createElement('details');
+                d.open=!!openStates[key];
+                d.addEventListener('toggle',()=>{ openStates[key]=d.open; saveOpenStates(); });
+
+                const s=document.createElement('summary'); s.textContent=pat.name;
+                const act=document.createElement('span'); act.className='actions';
+                act.append(
+                    createBtn('Загрузить видео',()=>{
+                        openStates[key]=true; saveOpenStates();
+                        const inp=document.createElement('input'); inp.type='file'; inp.multiple=true; inp.accept='video/*';
+                        inp.onchange=async()=>{ await api.upload(currentLabel,pat.name,Array.from(inp.files)); loadAndRender(); };
+                        inp.click();
+                    }),
+                    createBtn('Переименовать',async()=>{
+                        const nm=prompt('Новое имя патологии:',pat.name);
+                        if(!nm) return;
+                        await api.renamePat(currentLabel,pat.name,nm);
+                        delete openStates[key];
+                        loadAndRender();
+                    }),
+                    createBtn('Удалить',async()=>{
+                        if(!confirm(`Удалить патологию «${pat.name}»?`))return;
+                        await api.delPat(currentLabel,pat.name);
+                        delete openStates[key];
+                        loadAndRender();
+                    })
+                );
+                s.appendChild(act); d.appendChild(s);
+
+                const ul=document.createElement('ul'); ul.className='video-list';
+                pat.files.forEach(url=>{
+                    const li=document.createElement('li');
+                    const a=document.createElement('a'); a.href=url; a.textContent=url.split('/').pop(); a.target='_blank';
+                    li.appendChild(a); ul.appendChild(li);
+                });
+                d.appendChild(ul); fm.appendChild(d);
+            });
+        }
+    }
+
+    function createBtn(text,fn){
+        const b=document.createElement('button');
+        b.type='button'; b.textContent=text;
+        b.addEventListener('click',e=>{ e.stopPropagation(); fn(); });
+        return b;
+    }
+
+    loadAndRender();
+</script>
+</body>
 </html>

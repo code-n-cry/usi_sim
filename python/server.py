@@ -1,89 +1,113 @@
-import qrcode
-
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from pathlib import Path
-from pydantic import BaseSettings
+import shutil
 
-
-class Settings(BaseSettings):
-    USE_NGROK = True
-
-
-BASE_DIR = str(Path(__file__).resolve().parent.parent)
-settings = Settings()
 app = FastAPI()
 
+# Теперь server.py лежит в python/, а BASE_DIR — это корень проекта (папка-родитель папки python)
+BASE_DIR   = Path(__file__).resolve().parent.parent
+STORAGE    = BASE_DIR / "storage"
+TEMPLATES  = BASE_DIR / "templates"
 
-def init_webhooks(base_url):
-    pass
+# Создаем storage, если его нет
+STORAGE.mkdir(parents=True, exist_ok=True)
 
+# Шаблоны из ../templates
+templates = Jinja2Templates(directory=str(TEMPLATES))
 
-if settings.USE_NGROK:
-    from pyngrok import ngrok
+# Раздаем загруженные видео из ../storage
+app.mount("/storage", StaticFiles(directory=str(STORAGE)), name="storage")
 
-    port = "8000"
-    public_url = f"http://10.42.0.1:{port}"
-    qr = qrcode.make(public_url)
+class LabelIn(BaseModel):
+    number: str
+    code: str
 
-app.mount(
-    "/static",
-    StaticFiles(directory=BASE_DIR + "/static"),
-    name="static",
-)
-templates = Jinja2Templates(directory=BASE_DIR + "/templates")
-chosen_values = {
-    '1': 'Норма, LN',
-    '2': 'Норма, LN',
-    '3': 'Норма, CN',
-    '4': 'Норма, CN',
-    '5': 'Норма, LN',
-    '6': 'Норма, CN',
-    '7': 'Норма, LN',
-}
-with open('patology.txt', 'r') as all_patologies:
-    values = {}
-    list_patologies = [
-        i.replace('\n', '').split(',') for i in all_patologies.readlines()
-    ]
-    for patology in list_patologies:
-        if patology[-1] not in values.keys():
-            values[patology[-1]] = [', '.join(patology[:-1])]
-        else:
-            values[patology[-1]].append(', '.join(patology[:-1]))
+class NameIn(BaseModel):
+    name: str
 
+class RenameIn(BaseModel):
+    newName: str
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "chosen": chosen_values, "values": values},
-    )
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/api/data")
+async def list_all():
+    out = []
+    for lbl in sorted(STORAGE.iterdir()):
+        if not lbl.is_dir(): continue
+        pats = []
+        for pat in sorted(lbl.iterdir()):
+            if not pat.is_dir(): continue
+            vids = [
+                f"/storage/{lbl.name}/{pat.name}/{f.name}"
+                for f in sorted(pat.iterdir())
+                if f.is_file()
+            ]
+            pats.append({"name": pat.name, "files": vids})
+        out.append({"name": lbl.name, "pathologies": pats})
+    return out
 
-@app.post("/handle-change")
-async def handle_change(request: Request):
-    global chosen_values
-    form_data = await request.form()
-    for i in dict(form_data):
-        if i == '3':
-            chosen_values['3'] = form_data[i]
-            chosen_values['4'] = form_data[i]
-            chosen_values['6'] = form_data[i]
-        else:
-            chosen_values[i] = form_data[i]
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "chosen": chosen_values, "values": values},
-    )
+@app.post("/api/labels", status_code=201)
+async def create_label(in_: LabelIn):
+    (STORAGE / f"{in_.number}_{in_.code}").mkdir(exist_ok=True)
+    return {"ok": True}
 
+@app.put("/api/labels/{label}/number")
+async def rename_number(label: str, in_: RenameIn):
+    num, code = label.split("_", 1)
+    src = STORAGE / label
+    dst = STORAGE / f"{in_.newName}_{code}"
+    src.rename(dst)
+    return {"ok": True}
 
-@app.get("/current-values")
-async def handle_valyes(request: Request):
-    global chosen_values
-    return chosen_values
+@app.put("/api/labels/{label}/code")
+async def rename_code(label: str, in_: RenameIn):
+    num, code = label.split("_", 1)
+    src = STORAGE / label
+    dst = STORAGE / f"{num}_{in_.newName}"
+    src.rename(dst)
+    return {"ok": True}
 
+@app.delete("/api/labels/{label}")
+async def delete_label(label: str):
+    shutil.rmtree(STORAGE / label, ignore_errors=True)
+    return {"ok": True}
 
-qr.show()
+@app.post("/api/labels/{label}/pathologies", status_code=201)
+async def create_pathology(label: str, in_: NameIn):
+    (STORAGE / label / in_.name).mkdir(parents=True, exist_ok=True)
+    return {"ok": True}
+
+@app.put("/api/labels/{label}/pathologies/{pat}")
+async def rename_pathology(label: str, pat: str, in_: RenameIn):
+    src = STORAGE / label / pat
+    dst = STORAGE / label / in_.newName
+    src.rename(dst)
+    return {"ok": True}
+
+@app.delete("/api/labels/{label}/pathologies/{pat}")
+async def delete_pathology(label: str, pat: str):
+    shutil.rmtree(STORAGE / label / pat, ignore_errors=True)
+    return {"ok": True}
+
+@app.post(
+    "/api/labels/{label}/pathologies/{pat}/files",
+    status_code=201
+)
+async def upload_videos(
+        label: str,
+        pat: str,
+        files: list[UploadFile] = File(...)
+):
+    dest_dir = STORAGE / label / pat
+    for file in files:
+        out_path = dest_dir / file.filename
+        with out_path.open("wb") as buf:
+            shutil.copyfileobj(file.file, buf)
+    return {"ok": True}

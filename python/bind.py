@@ -1,5 +1,5 @@
 import os
-import serial
+#import serial
 import subprocess
 import tkinter
 import tkinter.messagebox
@@ -61,37 +61,37 @@ def bind():
     """Добавляет новую метку или заменяет существующую"""
     global lbl
 
-    try:
-        port = serial.Serial("/dev/ttyUSB0", baudrate=9600)
-    except serial.SerialException:
-        tkinter.messagebox.showerror("Ошибка", "Не удалось открыть порт /dev/ttyUSB0")
-        return
-
-    if not port.is_open:
-        try:
-            port.open()
-        except:
-            tkinter.messagebox.showerror("Ошибка", "Не удалось открыть порт /dev/ttyUSB0")
-            return
-
-    port.read_all()  # Очищаем буфер
+    # try:
+    #     port = serial.Serial("/dev/ttyUSB0", baudrate=9600)
+    # except serial.SerialException:
+    #     tkinter.messagebox.showerror("Ошибка", "Не удалось открыть порт /dev/ttyUSB0")
+    #     return
+    #
+    # if not port.is_open:
+    #     try:
+    #         port.open()
+    #     except:
+    #         tkinter.messagebox.showerror("Ошибка", "Не удалось открыть порт /dev/ttyUSB0")
+    #         return
+    #
+    # port.read_all()  # Очищаем буфер
     current_line = ""
-    try:
-        while True:
-            data = port.readline().decode(encoding="latin-1", errors="ignore").replace("\r\n", "")
-            if data and data != "0":
-                current_line = data
-                break
-    except:
-        tkinter.messagebox.showerror("Ошибка", "Ошибка при чтении данных с порта")
-        port.close()
-        return
-
-    port.close()
-
-    if not current_line:
-        tkinter.messagebox.showerror("Ошибка", "Не удалось считать данные с датчика")
-        return
+    # try:
+    #     while True:
+    #         data = port.readline().decode(encoding="latin-1", errors="ignore").replace("\r\n", "")
+    #         if data and data != "0":
+    #             current_line = data
+    #             break
+    # except:
+    #     tkinter.messagebox.showerror("Ошибка", "Ошибка при чтении данных с порта")
+    #     port.close()
+    #     return
+    #
+    # port.close()
+    #
+    # if not current_line:
+    #     tkinter.messagebox.showerror("Ошибка", "Не удалось считать данные с датчика")
+    #     return
 
     # Проверяем, есть ли такое значение уже в словаре
     existing_num = None
@@ -218,47 +218,47 @@ def edit_labels():
             return
 
         # Считываем новое значение с датчика
-        try:
-            port = serial.Serial("/dev/ttyUSB0", baudrate=9600)
-            if not port.is_open:
-                port.open()
-
-            port.read_all()  # Очищаем буфер
-            new_value = ""
-            while True:
-                try:
-                    data = port.readline().decode(encoding="latin-1", errors="ignore").replace("\r\n", "")
-                    if data and data != "0":
-                        new_value = data
-                        break
-                except:
-                    continue
-
-            port.close()
-
-            if not new_value:
-                tkinter.messagebox.showerror("Ошибка", "Не удалось считать данные с датчика")
-                return
-
-            # Удаляем старую метку с таким же значением (если есть)
-            for k, v in list(label_to_value.items()):
-                if v == new_value and k != old_num:
-                    del label_to_value[k]
-
-            # Обновляем значение
-            label_to_value[old_num] = new_value
-            label_dict_to_file()
-            rebuild_labels()
-
-            # Обновляем список в окне редактирования
-            listbox.delete(index)
-            listbox.insert(index, f"Метка {old_num}: {new_value}")
-            listbox.select_set(index)
-
-            tkinter.messagebox.showinfo("Успех", f"Метка {old_num} перепривязана")
-
-        except serial.SerialException:
-            tkinter.messagebox.showerror("Ошибка", "Не удалось открыть порт /dev/ttyUSB0")
+        # try:
+        #     port = serial.Serial("/dev/ttyUSB0", baudrate=9600)
+        #     if not port.is_open:
+        #         port.open()
+        #
+        #     port.read_all()  # Очищаем буфер
+        #     new_value = ""
+        #     while True:
+        #         try:
+        #             data = port.readline().decode(encoding="latin-1", errors="ignore").replace("\r\n", "")
+        #             if data and data != "0":
+        #                 new_value = data
+        #                 break
+        #         except:
+        #             continue
+        #
+        #     port.close()
+        #
+        #     if not new_value:
+        #         tkinter.messagebox.showerror("Ошибка", "Не удалось считать данные с датчика")
+        #         return
+        #
+        #     # Удаляем старую метку с таким же значением (если есть)
+        #     for k, v in list(label_to_value.items()):
+        #         if v == new_value and k != old_num:
+        #             del label_to_value[k]
+        #
+        #     # Обновляем значение
+        #     label_to_value[old_num] = new_value
+        #     label_dict_to_file()
+        #     rebuild_labels()
+        #
+        #     # Обновляем список в окне редактирования
+        #     listbox.delete(index)
+        #     listbox.insert(index, f"Метка {old_num}: {new_value}")
+        #     listbox.select_set(index)
+        #
+        #     tkinter.messagebox.showinfo("Успех", f"Метка {old_num} перепривязана")
+        #
+        # except serial.SerialException:
+        #     tkinter.messagebox.showerror("Ошибка", "Не удалось открыть порт /dev/ttyUSB0")
 
     def change_number():
         """Изменяет номер существующей метки"""
@@ -473,3 +473,6 @@ window.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Запуск главного цикла
 window.mainloop()
+
+import uvicorn
+uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
