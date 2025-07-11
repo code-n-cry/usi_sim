@@ -463,7 +463,7 @@ start_server_btn.pack(side=tkinter.TOP, pady=5)
 # Авторская подпись
 author_label = tkinter.Label(
     window,
-    text="Создатели: Щукины Владислав Владимирович и Егор Владиславович",
+    text="Создатели: Щукины Владислав Владимирович и Егор Владиславович, Сафонов Алексей",
     font=("Arial", 9)
 )
 author_label.place(relx=0.5, rely=0.95, anchor="center")
@@ -473,6 +473,3 @@ window.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Запуск главного цикла
 window.mainloop()
-
-import uvicorn
-uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
