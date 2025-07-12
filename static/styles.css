@@ -1,0 +1,132 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-size: 11px;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #f7f7f7;
+    transition: background-color 0.3s;
+}
+main.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: background-color 0.3s, color 0.3s;
+}
+h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: #333;
+    transition: color 0.3s;
+}
+
+/* Кнопка темы */
+.buttons {
+    position: relative;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+#toggle-theme {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 1.2em;
+    padding: 0.2em;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+#toggle-theme:focus {
+    outline: none;
+}
+
+/* Прочие стили как были */
+.buttons button {
+    margin: 0 0.4em;
+}
+#add-patology,
+#rename-label,
+#change-code,
+#delete-label {
+    display: none;
+}
+details {
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+}
+.actions button {
+    margin-left: 0.6em;
+    font-size: 0.9em;
+    padding: 0.3em 0.8em;
+}
+.video-list {
+    margin-left: 2.5em;
+    list-style: disc;
+    margin-bottom: 1em;
+}
+
+/* Главный экран */
+#file-manager.main-view details > summary {
+    list-style: none;
+    padding-left: 0;
+    color: #111 !important;
+    font-size: 1.1em;
+}
+#file-manager.main-view details > summary::-webkit-details-marker {
+    display: none;
+}
+#file-manager.main-view details > summary::marker {
+    font-size: 0;
+}
+#file-manager.main-view details > summary::after {
+    display: none;
+    content: none;
+}
+
+/* Внутри метки */
+#file-manager:not(.main-view) details[open] > summary {
+    color: #000;
+}
+#file-manager:not(.main-view) details:not([open]) > summary {
+    color: #555;
+}
+
+/* === Dark theme overrides === */
+html[data-theme="dark"] body {
+    background-color: #121212;
+}
+html[data-theme="dark"] main.container {
+    background-color: #1e1e1e;
+    color: #eee;
+}
+html[data-theme="dark"] h1 {
+    color: #eee;
+}
+html[data-theme="dark"] #file-manager.main-view details > summary {
+    color: #eee !important;
+}
+html[data-theme="dark"] #file-manager:not(.main-view) details[open] > summary {
+    color: #fff;
+}
+html[data-theme="dark"] #file-manager:not(.main-view) details:not([open]) > summary {
+    color: #aaa;
+}
+
+html[data-theme="light"] .contrast {
+    background-color: #e0e0e0;
+    color: #333333;
+    border: 1px solid #cccccc;
+}
+html[data-theme="light"] .contrast:hover,
+html[data-theme="light"] .contrast:focus {
+    background-color: #d4d4d4;
+    color: #222222;
+}

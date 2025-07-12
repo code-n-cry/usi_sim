@@ -21,6 +21,7 @@ templates = Jinja2Templates(directory=str(TEMPLATES))
 
 # Раздаем загруженные видео из ../storage
 app.mount("/storage", StaticFiles(directory=str(STORAGE)), name="storage")
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 class LabelIn(BaseModel):
     number: str
